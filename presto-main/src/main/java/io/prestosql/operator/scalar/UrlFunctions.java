@@ -184,7 +184,7 @@ public final class UrlFunctions
     public static Slice parseUrl(@SqlType("varchar(x)") Slice urlStr, @SqlType("varchar(x)") Slice partToExtract)
     {
         URL url = toUrl(urlStr);
-        if (url == null) {
+        if (url == null || partToExtract.length() == 0) {
             return null;
         }
 
