@@ -275,7 +275,6 @@ public class FunctionRegistry
                 .scalar(SplitToMultimapFunction.class)
                 .scalars(VarbinaryFunctions.class)
                 .scalars(UrlFunctions.class)
-                .scalars(ParseUrlFunction.class)
                 .scalars(MathFunctions.class)
                 .scalar(MathFunctions.Abs.class)
                 .scalar(MathFunctions.Sign.class)
