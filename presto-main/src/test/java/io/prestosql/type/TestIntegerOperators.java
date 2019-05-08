@@ -88,10 +88,10 @@ public class TestIntegerOperators
     @Test
     public void testDivide()
     {
-        assertFunction("INTEGER'37' / INTEGER'37'", INTEGER, 1);
-        assertFunction("INTEGER'37' / INTEGER'17'", INTEGER, 37 / 17);
-        assertFunction("INTEGER'17' / INTEGER'37'", INTEGER, 17 / 37);
-        assertFunction("INTEGER'17' / INTEGER'17'", INTEGER, 1);
+        assertFunction("INTEGER'37' / INTEGER'37'", DOUBLE, 1.0);
+        assertFunction("INTEGER'37' / INTEGER'17'", DOUBLE, 37.0 / 17);
+        assertFunction("INTEGER'17' / INTEGER'37'", DOUBLE, 17.0 / 37);
+        assertFunction("INTEGER'17' / INTEGER'17'", DOUBLE, 1.0);
         assertInvalidFunction("INTEGER'17' / INTEGER'0'", DIVISION_BY_ZERO);
     }
 

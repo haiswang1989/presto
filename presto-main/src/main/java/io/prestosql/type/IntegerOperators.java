@@ -98,11 +98,14 @@ public final class IntegerOperators
     }
 
     @ScalarOperator(DIVIDE)
-    @SqlType(StandardTypes.INTEGER)
-    public static long divide(@SqlType(StandardTypes.INTEGER) long left, @SqlType(StandardTypes.INTEGER) long right)
+    @SqlType(StandardTypes.DOUBLE)
+    public static double divide(@SqlType(StandardTypes.INTEGER) long left, @SqlType(StandardTypes.INTEGER) long right)
     {
         try {
-            return left / right;
+            if (right == 0) {
+                throw new ArithmeticException("/ by zero");
+            }
+            return (double) left / right;
         }
         catch (ArithmeticException e) {
             throw new PrestoException(DIVISION_BY_ZERO, "Division by zero", e);
