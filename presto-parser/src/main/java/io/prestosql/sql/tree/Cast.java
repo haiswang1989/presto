@@ -67,7 +67,7 @@ public final class Cast
         requireNonNull(type, "type is null");
 
         this.expression = expression;
-        this.type = type.toLowerCase(ENGLISH);
+        this.type = type.equalsIgnoreCase("string") ? "varchar" : type.toLowerCase(ENGLISH);
         this.safe = safe;
         this.typeOnly = typeOnly;
     }
