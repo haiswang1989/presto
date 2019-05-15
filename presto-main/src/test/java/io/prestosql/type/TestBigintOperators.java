@@ -86,10 +86,10 @@ public class TestBigintOperators
     @Test
     public void testDivide()
     {
-        assertFunction("100000000037 / 37", BIGINT, 100000000037L / 37L);
-        assertFunction("37 / 100000000017", BIGINT, 37 / 100000000017L);
-        assertFunction("100000000017 / 37", BIGINT, 100000000017L / 37L);
-        assertFunction("100000000017 / 100000000017", BIGINT, 100000000017L / 100000000017L);
+        assertFunction("100000000037 / 37", DOUBLE, 100000000037L / 37.0);
+        assertFunction("37 / 100000000017", DOUBLE, 37.0 / 100000000017L);
+        assertFunction("100000000017 / 37", DOUBLE, 100000000017L / 37.0);
+        assertFunction("100000000017 / 100000000017", DOUBLE, 100000000017.0 / 100000000017L);
     }
 
     @Test

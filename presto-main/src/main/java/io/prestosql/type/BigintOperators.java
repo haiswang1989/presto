@@ -20,38 +20,15 @@ import io.airlift.slice.Slice;
 import io.airlift.slice.XxHash64;
 import io.prestosql.spi.PrestoException;
 import io.prestosql.spi.block.Block;
-import io.prestosql.spi.function.BlockIndex;
-import io.prestosql.spi.function.BlockPosition;
-import io.prestosql.spi.function.IsNull;
-import io.prestosql.spi.function.LiteralParameters;
-import io.prestosql.spi.function.ScalarOperator;
-import io.prestosql.spi.function.SqlNullable;
-import io.prestosql.spi.function.SqlType;
+import io.prestosql.spi.function.*;
 import io.prestosql.spi.type.AbstractLongType;
 import io.prestosql.spi.type.StandardTypes;
+import io.prestosql.util.SliceUtils;
 
 import static io.airlift.slice.Slices.utf8Slice;
 import static io.prestosql.spi.StandardErrorCode.DIVISION_BY_ZERO;
 import static io.prestosql.spi.StandardErrorCode.NUMERIC_VALUE_OUT_OF_RANGE;
-import static io.prestosql.spi.function.OperatorType.ADD;
-import static io.prestosql.spi.function.OperatorType.BETWEEN;
-import static io.prestosql.spi.function.OperatorType.CAST;
-import static io.prestosql.spi.function.OperatorType.DIVIDE;
-import static io.prestosql.spi.function.OperatorType.EQUAL;
-import static io.prestosql.spi.function.OperatorType.GREATER_THAN;
-import static io.prestosql.spi.function.OperatorType.GREATER_THAN_OR_EQUAL;
-import static io.prestosql.spi.function.OperatorType.HASH_CODE;
-import static io.prestosql.spi.function.OperatorType.INDETERMINATE;
-import static io.prestosql.spi.function.OperatorType.IS_DISTINCT_FROM;
-import static io.prestosql.spi.function.OperatorType.LESS_THAN;
-import static io.prestosql.spi.function.OperatorType.LESS_THAN_OR_EQUAL;
-import static io.prestosql.spi.function.OperatorType.MODULUS;
-import static io.prestosql.spi.function.OperatorType.MULTIPLY;
-import static io.prestosql.spi.function.OperatorType.NEGATION;
-import static io.prestosql.spi.function.OperatorType.NOT_EQUAL;
-import static io.prestosql.spi.function.OperatorType.SATURATED_FLOOR_CAST;
-import static io.prestosql.spi.function.OperatorType.SUBTRACT;
-import static io.prestosql.spi.function.OperatorType.XX_HASH_64;
+import static io.prestosql.spi.function.OperatorType.*;
 import static io.prestosql.spi.type.BigintType.BIGINT;
 import static java.lang.Float.floatToRawIntBits;
 import static java.lang.Math.toIntExact;
@@ -100,14 +77,17 @@ public final class BigintOperators
     }
 
     @ScalarOperator(DIVIDE)
-    @SqlType(StandardTypes.BIGINT)
-    public static long divide(@SqlType(StandardTypes.BIGINT) long left, @SqlType(StandardTypes.BIGINT) long right)
+    @SqlType(StandardTypes.DOUBLE)
+    public static double divide(@SqlType(StandardTypes.BIGINT) long left, @SqlType(StandardTypes.BIGINT) long right)
     {
         try {
             if (left == Long.MIN_VALUE && right == -1) {
                 throw new PrestoException(NUMERIC_VALUE_OUT_OF_RANGE, format("bigint division overflow: %s / %s", left, right));
             }
-            return left / right;
+            if (right == 0) {
+                throw new ArithmeticException("/ by zero");
+            }
+            return (double) left / right;
         }
         catch (ArithmeticException e) {
             throw new PrestoException(DIVISION_BY_ZERO, "Division by zero", e);
@@ -146,12 +126,44 @@ public final class BigintOperators
         return left == right;
     }
 
+    @ScalarOperator(EQUAL)
+    @SqlType(StandardTypes.BOOLEAN)
+    @SqlNullable
+    public static Boolean equal(@SqlType(StandardTypes.VARCHAR) Slice left, @SqlType(StandardTypes.BIGINT) long right)
+    {
+        return SliceUtils.toLong(left) == right;
+    }
+
+    @ScalarOperator(EQUAL)
+    @SqlType(StandardTypes.BOOLEAN)
+    @SqlNullable
+    public static Boolean equal(@SqlType(StandardTypes.BIGINT) long left, @SqlType(StandardTypes.VARCHAR) Slice right)
+    {
+        return left == SliceUtils.toLong(right);
+    }
+
     @ScalarOperator(NOT_EQUAL)
     @SqlType(StandardTypes.BOOLEAN)
     @SqlNullable
     public static Boolean notEqual(@SqlType(StandardTypes.BIGINT) long left, @SqlType(StandardTypes.BIGINT) long right)
     {
         return left != right;
+    }
+
+    @ScalarOperator(NOT_EQUAL)
+    @SqlType(StandardTypes.BOOLEAN)
+    @SqlNullable
+    public static Boolean notEqual(@SqlType(StandardTypes.VARCHAR) Slice left, @SqlType(StandardTypes.BIGINT) long right)
+    {
+        return SliceUtils.toLong(left) != right;
+    }
+
+    @ScalarOperator(NOT_EQUAL)
+    @SqlType(StandardTypes.BOOLEAN)
+    @SqlNullable
+    public static Boolean notEqual(@SqlType(StandardTypes.BIGINT) long left, @SqlType(StandardTypes.VARCHAR) Slice right)
+    {
+        return left != SliceUtils.toLong(right);
     }
 
     @ScalarOperator(LESS_THAN)
@@ -161,11 +173,39 @@ public final class BigintOperators
         return left < right;
     }
 
+    @ScalarOperator(LESS_THAN)
+    @SqlType(StandardTypes.BOOLEAN)
+    public static boolean lessThan(@SqlType(StandardTypes.VARCHAR) Slice left, @SqlType(StandardTypes.BIGINT) long right)
+    {
+        return SliceUtils.toLong(left) < right;
+    }
+
+    @ScalarOperator(LESS_THAN)
+    @SqlType(StandardTypes.BOOLEAN)
+    public static boolean lessThan(@SqlType(StandardTypes.BIGINT) long left, @SqlType(StandardTypes.VARCHAR) Slice right)
+    {
+        return left < SliceUtils.toLong(right);
+    }
+
     @ScalarOperator(LESS_THAN_OR_EQUAL)
     @SqlType(StandardTypes.BOOLEAN)
     public static boolean lessThanOrEqual(@SqlType(StandardTypes.BIGINT) long left, @SqlType(StandardTypes.BIGINT) long right)
     {
         return left <= right;
+    }
+
+    @ScalarOperator(LESS_THAN_OR_EQUAL)
+    @SqlType(StandardTypes.BOOLEAN)
+    public static boolean lessThanOrEqual(@SqlType(StandardTypes.VARCHAR) Slice left, @SqlType(StandardTypes.BIGINT) long right)
+    {
+        return SliceUtils.toLong(left) <= right;
+    }
+
+    @ScalarOperator(LESS_THAN_OR_EQUAL)
+    @SqlType(StandardTypes.BOOLEAN)
+    public static boolean lessThanOrEqual(@SqlType(StandardTypes.BIGINT) long left, @SqlType(StandardTypes.VARCHAR) Slice right)
+    {
+        return left <= SliceUtils.toLong(right);
     }
 
     @ScalarOperator(GREATER_THAN)
@@ -175,11 +215,39 @@ public final class BigintOperators
         return left > right;
     }
 
+    @ScalarOperator(GREATER_THAN)
+    @SqlType(StandardTypes.BOOLEAN)
+    public static boolean greaterThan(@SqlType(StandardTypes.VARCHAR) Slice left, @SqlType(StandardTypes.BIGINT) long right)
+    {
+        return SliceUtils.toLong(left) > right;
+    }
+
+    @ScalarOperator(GREATER_THAN)
+    @SqlType(StandardTypes.BOOLEAN)
+    public static boolean greaterThan(@SqlType(StandardTypes.BIGINT) long left, @SqlType(StandardTypes.VARCHAR) Slice right)
+    {
+        return left > SliceUtils.toLong(right);
+    }
+
     @ScalarOperator(GREATER_THAN_OR_EQUAL)
     @SqlType(StandardTypes.BOOLEAN)
     public static boolean greaterThanOrEqual(@SqlType(StandardTypes.BIGINT) long left, @SqlType(StandardTypes.BIGINT) long right)
     {
         return left >= right;
+    }
+
+    @ScalarOperator(GREATER_THAN_OR_EQUAL)
+    @SqlType(StandardTypes.BOOLEAN)
+    public static boolean greaterThanOrEqual(@SqlType(StandardTypes.VARCHAR) Slice left, @SqlType(StandardTypes.BIGINT) long right)
+    {
+        return SliceUtils.toLong(left) >= right;
+    }
+
+    @ScalarOperator(GREATER_THAN_OR_EQUAL)
+    @SqlType(StandardTypes.BOOLEAN)
+    public static boolean greaterThanOrEqual(@SqlType(StandardTypes.BIGINT) long left, @SqlType(StandardTypes.VARCHAR) Slice right)
+    {
+        return left >= SliceUtils.toLong(right);
     }
 
     @ScalarOperator(BETWEEN)
