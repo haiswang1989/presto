@@ -250,6 +250,9 @@ public final class StringFunctions
     @SqlType("char(x)")
     public static Slice charSubstr(@SqlType("char(x)") Slice utf8, @SqlType(StandardTypes.BIGINT) long start)
     {
+        if (start == 0) {
+            start = 1;
+        }
         return substr(utf8, start);
     }
 
@@ -308,6 +311,9 @@ public final class StringFunctions
     @SqlType("char(x)")
     public static Slice charSubstr(@SqlType("char(x)") Slice utf8, @SqlType(StandardTypes.BIGINT) long start, @SqlType(StandardTypes.BIGINT) long length)
     {
+        if (start == 0) {
+            start = 1;
+        }
         return trimTrailingSpaces(substr(utf8, start, length));
     }
 
