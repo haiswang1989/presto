@@ -24,6 +24,7 @@ import io.prestosql.spi.function.ScalarFunction;
 import io.prestosql.spi.function.SqlType;
 import io.prestosql.spi.type.StandardTypes;
 import io.prestosql.spi.type.TimeZoneKey;
+import io.prestosql.util.DateTimeUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeField;
 import org.joda.time.DateTimeZone;
@@ -425,6 +426,32 @@ public final class DateTimeFunctions
     {
         long millis = getTimestampField(unpackChronology(timestampWithTimeZone), unit).add(unpackMillisUtc(timestampWithTimeZone), toIntExact(value));
         return updateMillisUtc(millis, timestampWithTimeZone);
+    }
+
+    @Description("add the specified amount of time to the given time")
+    @LiteralParameters("x")
+    @ScalarFunction("date_add")
+    @SqlType(StandardTypes.VARCHAR)
+    public static Slice dateAdd(
+            @SqlType("varchar(x)") Slice slice,
+            @SqlType(StandardTypes.BIGINT) long value)
+    {
+        DateTime dt1 = DateTimeUtils.parseDateTime(slice.toStringUtf8());
+        DateTime dt2 = dt1.plusDays(toIntExact(value));
+        return utf8Slice(dt2.toString("yyyy-MM-dd"));
+    }
+
+    @Description("sub the specified amount of time to the given time")
+    @LiteralParameters("x")
+    @ScalarFunction("date_sub")
+    @SqlType(StandardTypes.VARCHAR)
+    public static Slice dateSub(
+            @SqlType("varchar(x)") Slice slice,
+            @SqlType(StandardTypes.BIGINT) long value)
+    {
+        DateTime dt1 = DateTimeUtils.parseDateTime(slice.toStringUtf8());
+        DateTime dt2 = dt1.minusDays(toIntExact(value));
+        return utf8Slice(dt2.toString("yyyy-MM-dd"));
     }
 
     @Description("difference of the given dates in the given unit")
