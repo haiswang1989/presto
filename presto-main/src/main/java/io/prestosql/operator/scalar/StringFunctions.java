@@ -212,8 +212,12 @@ public final class StringFunctions
     @SqlType("varchar(x)")
     public static Slice substr(@SqlType("varchar(x)") Slice utf8, @SqlType(StandardTypes.BIGINT) long start)
     {
-        if ((start == 0) || utf8.length() == 0) {
+        if (utf8.length() == 0) {
             return Slices.EMPTY_SLICE;
+        }
+
+        if (start == 0) {
+            start = 1;
         }
 
         int startCodePoint = Ints.saturatedCast(start);
@@ -250,9 +254,6 @@ public final class StringFunctions
     @SqlType("char(x)")
     public static Slice charSubstr(@SqlType("char(x)") Slice utf8, @SqlType(StandardTypes.BIGINT) long start)
     {
-        if (start == 0) {
-            start = 1;
-        }
         return substr(utf8, start);
     }
 
@@ -262,8 +263,12 @@ public final class StringFunctions
     @SqlType("varchar(x)")
     public static Slice substr(@SqlType("varchar(x)") Slice utf8, @SqlType(StandardTypes.BIGINT) long start, @SqlType(StandardTypes.BIGINT) long length)
     {
-        if (start == 0 || (length <= 0) || (utf8.length() == 0)) {
+        if ((length <= 0) || (utf8.length() == 0)) {
             return Slices.EMPTY_SLICE;
+        }
+
+        if (start == 0) {
+            start = 1;
         }
 
         int startCodePoint = Ints.saturatedCast(start);
@@ -311,9 +316,6 @@ public final class StringFunctions
     @SqlType("char(x)")
     public static Slice charSubstr(@SqlType("char(x)") Slice utf8, @SqlType(StandardTypes.BIGINT) long start, @SqlType(StandardTypes.BIGINT) long length)
     {
-        if (start == 0) {
-            start = 1;
-        }
         return trimTrailingSpaces(substr(utf8, start, length));
     }
 
