@@ -454,6 +454,15 @@ public final class DateTimeFunctions
         return utf8Slice(dt2.toString("yyyy-MM-dd"));
     }
 
+    @ScalarFunction("to_date")
+    @LiteralParameters("x")
+    @SqlType(StandardTypes.VARCHAR)
+    public static Slice toDate(@SqlType("varchar(x)") Slice slice)
+    {
+        DateTime dt1 = DateTimeUtils.parseDateTime(slice.toStringUtf8());
+        return utf8Slice(dt1.toString("yyyy-MM-dd"));
+    }
+
     @Description("difference of the given dates in the given unit")
     @ScalarFunction("date_diff")
     @LiteralParameters("x")
