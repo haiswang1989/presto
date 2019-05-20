@@ -29,7 +29,6 @@ import io.prestosql.spi.function.SqlNullable;
 import io.prestosql.spi.function.SqlType;
 import io.prestosql.spi.type.AbstractLongType;
 import io.prestosql.spi.type.StandardTypes;
-import io.prestosql.util.SliceUtils;
 
 import static io.airlift.slice.Slices.utf8Slice;
 import static io.prestosql.spi.StandardErrorCode.DIVISION_BY_ZERO;
@@ -150,44 +149,12 @@ public final class BigintOperators
         return left == right;
     }
 
-    @ScalarOperator(EQUAL)
-    @SqlType(StandardTypes.BOOLEAN)
-    @SqlNullable
-    public static Boolean equal(@SqlType(StandardTypes.VARCHAR) Slice left, @SqlType(StandardTypes.BIGINT) long right)
-    {
-        return SliceUtils.toLong(left) == right;
-    }
-
-    @ScalarOperator(EQUAL)
-    @SqlType(StandardTypes.BOOLEAN)
-    @SqlNullable
-    public static Boolean equal(@SqlType(StandardTypes.BIGINT) long left, @SqlType(StandardTypes.VARCHAR) Slice right)
-    {
-        return left == SliceUtils.toLong(right);
-    }
-
     @ScalarOperator(NOT_EQUAL)
     @SqlType(StandardTypes.BOOLEAN)
     @SqlNullable
     public static Boolean notEqual(@SqlType(StandardTypes.BIGINT) long left, @SqlType(StandardTypes.BIGINT) long right)
     {
         return left != right;
-    }
-
-    @ScalarOperator(NOT_EQUAL)
-    @SqlType(StandardTypes.BOOLEAN)
-    @SqlNullable
-    public static Boolean notEqual(@SqlType(StandardTypes.VARCHAR) Slice left, @SqlType(StandardTypes.BIGINT) long right)
-    {
-        return SliceUtils.toLong(left) != right;
-    }
-
-    @ScalarOperator(NOT_EQUAL)
-    @SqlType(StandardTypes.BOOLEAN)
-    @SqlNullable
-    public static Boolean notEqual(@SqlType(StandardTypes.BIGINT) long left, @SqlType(StandardTypes.VARCHAR) Slice right)
-    {
-        return left != SliceUtils.toLong(right);
     }
 
     @ScalarOperator(LESS_THAN)
@@ -197,39 +164,11 @@ public final class BigintOperators
         return left < right;
     }
 
-    @ScalarOperator(LESS_THAN)
-    @SqlType(StandardTypes.BOOLEAN)
-    public static boolean lessThan(@SqlType(StandardTypes.VARCHAR) Slice left, @SqlType(StandardTypes.BIGINT) long right)
-    {
-        return SliceUtils.toLong(left) < right;
-    }
-
-    @ScalarOperator(LESS_THAN)
-    @SqlType(StandardTypes.BOOLEAN)
-    public static boolean lessThan(@SqlType(StandardTypes.BIGINT) long left, @SqlType(StandardTypes.VARCHAR) Slice right)
-    {
-        return left < SliceUtils.toLong(right);
-    }
-
     @ScalarOperator(LESS_THAN_OR_EQUAL)
     @SqlType(StandardTypes.BOOLEAN)
     public static boolean lessThanOrEqual(@SqlType(StandardTypes.BIGINT) long left, @SqlType(StandardTypes.BIGINT) long right)
     {
         return left <= right;
-    }
-
-    @ScalarOperator(LESS_THAN_OR_EQUAL)
-    @SqlType(StandardTypes.BOOLEAN)
-    public static boolean lessThanOrEqual(@SqlType(StandardTypes.VARCHAR) Slice left, @SqlType(StandardTypes.BIGINT) long right)
-    {
-        return SliceUtils.toLong(left) <= right;
-    }
-
-    @ScalarOperator(LESS_THAN_OR_EQUAL)
-    @SqlType(StandardTypes.BOOLEAN)
-    public static boolean lessThanOrEqual(@SqlType(StandardTypes.BIGINT) long left, @SqlType(StandardTypes.VARCHAR) Slice right)
-    {
-        return left <= SliceUtils.toLong(right);
     }
 
     @ScalarOperator(GREATER_THAN)
@@ -239,39 +178,11 @@ public final class BigintOperators
         return left > right;
     }
 
-    @ScalarOperator(GREATER_THAN)
-    @SqlType(StandardTypes.BOOLEAN)
-    public static boolean greaterThan(@SqlType(StandardTypes.VARCHAR) Slice left, @SqlType(StandardTypes.BIGINT) long right)
-    {
-        return SliceUtils.toLong(left) > right;
-    }
-
-    @ScalarOperator(GREATER_THAN)
-    @SqlType(StandardTypes.BOOLEAN)
-    public static boolean greaterThan(@SqlType(StandardTypes.BIGINT) long left, @SqlType(StandardTypes.VARCHAR) Slice right)
-    {
-        return left > SliceUtils.toLong(right);
-    }
-
     @ScalarOperator(GREATER_THAN_OR_EQUAL)
     @SqlType(StandardTypes.BOOLEAN)
     public static boolean greaterThanOrEqual(@SqlType(StandardTypes.BIGINT) long left, @SqlType(StandardTypes.BIGINT) long right)
     {
         return left >= right;
-    }
-
-    @ScalarOperator(GREATER_THAN_OR_EQUAL)
-    @SqlType(StandardTypes.BOOLEAN)
-    public static boolean greaterThanOrEqual(@SqlType(StandardTypes.VARCHAR) Slice left, @SqlType(StandardTypes.BIGINT) long right)
-    {
-        return SliceUtils.toLong(left) >= right;
-    }
-
-    @ScalarOperator(GREATER_THAN_OR_EQUAL)
-    @SqlType(StandardTypes.BOOLEAN)
-    public static boolean greaterThanOrEqual(@SqlType(StandardTypes.BIGINT) long left, @SqlType(StandardTypes.VARCHAR) Slice right)
-    {
-        return left >= SliceUtils.toLong(right);
     }
 
     @ScalarOperator(BETWEEN)

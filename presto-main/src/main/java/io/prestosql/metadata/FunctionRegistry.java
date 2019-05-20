@@ -68,7 +68,6 @@ import io.prestosql.operator.aggregation.RealHistogramAggregation;
 import io.prestosql.operator.aggregation.RealRegressionAggregation;
 import io.prestosql.operator.aggregation.RealSumAggregation;
 import io.prestosql.operator.aggregation.SumDataSizeForStats;
-import io.prestosql.operator.aggregation.VarcharSumAggregation;
 import io.prestosql.operator.aggregation.VarianceAggregation;
 import io.prestosql.operator.aggregation.arrayagg.ArrayAggregationFunction;
 import io.prestosql.operator.aggregation.histogram.Histogram;
@@ -446,7 +445,6 @@ public class FunctionRegistry
                 .aggregates(DoubleSumAggregation.class)
                 .aggregates(RealSumAggregation.class)
                 .aggregates(LongSumAggregation.class)
-                .aggregates(VarcharSumAggregation.class)
                 .aggregates(IntervalDayToSecondSumAggregation.class)
                 .aggregates(IntervalYearToMonthSumAggregation.class)
                 .aggregates(AverageAggregations.class)

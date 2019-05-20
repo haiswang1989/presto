@@ -32,7 +32,6 @@ import javax.annotation.Nullable;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.net.URLDecoder;
 import java.util.Iterator;
 
@@ -176,41 +175,6 @@ public final class UrlFunctions
         }
     }
 
-    @SqlNullable
-    @ScalarFunction("parse_url")
-    @Description("Extracts a part from a URL")
-    @LiteralParameters("x")
-    @SqlType("varchar(x)")
-    public static Slice parseUrl(@SqlType("varchar(x)") Slice urlStr, @SqlType("varchar(x)") Slice partToExtract)
-    {
-        URL url = toUrl(urlStr);
-        if (url == null || partToExtract.length() == 0) {
-            return null;
-        }
-
-        String part = partToExtract.toStringUtf8();
-        switch (part) {
-            case "HOST":
-                return utf8Slice(url.getHost());
-            case "PATH":
-                return utf8Slice(url.getPath());
-            case "QUERY":
-                return utf8Slice(url.getQuery());
-            case "REF":
-                return utf8Slice(url.getRef());
-            case "PROTOCOL":
-                return utf8Slice(url.getProtocol());
-            case "FILE":
-                return utf8Slice(url.getFile());
-            case "AUTHORITY":
-                return utf8Slice(url.getAuthority());
-            case "USERINFO":
-                return utf8Slice(url.getUserInfo());
-        }
-
-        return null;
-    }
-
     private static Slice slice(@Nullable String s)
     {
         return utf8Slice(nullToEmpty(s));
@@ -223,17 +187,6 @@ public final class UrlFunctions
             return new URI(url.toStringUtf8());
         }
         catch (URISyntaxException e) {
-            return null;
-        }
-    }
-
-    @Nullable
-    private static URL toUrl(Slice url)
-    {
-        try {
-            return new URL(url.toStringUtf8());
-        }
-        catch (Exception e) {
             return null;
         }
     }
