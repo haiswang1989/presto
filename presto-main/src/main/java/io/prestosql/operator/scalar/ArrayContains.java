@@ -32,7 +32,7 @@ import static io.prestosql.spi.function.OperatorType.EQUAL;
 import static io.prestosql.util.Failures.internalError;
 
 @Description("Determines whether given value exists in the array")
-@ScalarFunction("contains")
+@ScalarFunction(value = "contains", alias = "array_contains")
 public final class ArrayContains
 {
     private ArrayContains() {}
