@@ -1329,7 +1329,7 @@ public class ExpressionAnalyzer
         private Type coerceToVarcharType(StackableAstVisitorContext<Context> context, List<Expression> expressions)
         {
             // determine super type
-            Type superType = VarcharType.createVarcharType(0);
+            Type superType = VarcharType.createUnboundedVarcharType();
 
             // verify all expressions can be coerced to the superType
             for (Expression expression : expressions) {
