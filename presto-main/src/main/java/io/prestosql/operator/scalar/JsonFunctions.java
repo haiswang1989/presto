@@ -432,6 +432,19 @@ public final class JsonFunctions
         }
     }
 
+    @ScalarFunction("get_json_object")
+    @SqlNullable
+    @LiteralParameters("x")
+    @SqlType("varchar(x)")
+    public static Slice getJsonObject(@SqlType("varchar(x)") Slice json, @SqlType(JsonPathType.NAME) JsonPath jsonPath)
+    {
+        Slice value = JsonExtract.extract(json, jsonPath.getScalarExtractor());
+        if (value == null) {
+            value = JsonExtract.extract(json, jsonPath.getObjectExtractor());
+        }
+        return value;
+    }
+
     @ScalarFunction("json_extract_scalar")
     @SqlNullable
     @LiteralParameters("x")
@@ -449,7 +462,7 @@ public final class JsonFunctions
         return JsonExtract.extract(json, jsonPath.getScalarExtractor());
     }
 
-    @ScalarFunction(value = "json_extract", alias = "get_json_object")
+    @ScalarFunction("json_extract")
     @LiteralParameters("x")
     @SqlNullable
     @SqlType(StandardTypes.JSON)
