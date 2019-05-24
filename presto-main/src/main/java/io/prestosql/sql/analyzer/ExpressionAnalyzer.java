@@ -35,6 +35,7 @@ import io.prestosql.spi.type.CharType;
 import io.prestosql.spi.type.DecimalParseResult;
 import io.prestosql.spi.type.Decimals;
 import io.prestosql.spi.type.RowType;
+import io.prestosql.spi.type.StandardTypes;
 import io.prestosql.spi.type.Type;
 import io.prestosql.spi.type.TypeManager;
 import io.prestosql.spi.type.TypeSignatureParameter;
@@ -104,7 +105,6 @@ import io.prestosql.sql.tree.WindowFrame;
 import io.prestosql.type.FunctionType;
 
 import javax.annotation.Nullable;
-
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -1011,10 +1011,14 @@ public class ExpressionAnalyzer
 
             if (valueList instanceof InListExpression) {
                 InListExpression inListExpression = (InListExpression) valueList;
+                List<Expression> expressions = ImmutableList.<Expression>builder().add(value).addAll(inListExpression.getValues()).build();
 
-                coerceToSingleType(context,
-                        "IN value and list items must be the same type: %s",
-                        ImmutableList.<Expression>builder().add(value).addAll(inListExpression.getValues()).build());
+                try {
+                    coerceToSingleType(context, "IN value and list items must be the same type: %s", expressions);
+                }
+                catch (Exception e) {
+                    coerceToVarcharType(context, expressions);
+                }
             }
             else if (valueList instanceof SubqueryExpression) {
                 coerceToSingleType(context, node, "value and result of subquery must be of the same type for IN expression: %s vs %s", value, valueList);
@@ -1314,6 +1318,22 @@ public class ExpressionAnalyzer
                     if (!typeManager.canCoerce(type, superType)) {
                         throw new SemanticException(TYPE_MISMATCH, expression, message, superType);
                     }
+                    addOrReplaceExpressionCoercion(expression, type, superType);
+                }
+            }
+
+            return superType;
+        }
+
+        private Type coerceToVarcharType(StackableAstVisitorContext<Context> context, List<Expression> expressions)
+        {
+            // determine super type
+            Type superType = VarcharType.createVarcharType(0);
+
+            // verify all expressions can be coerced to the superType
+            for (Expression expression : expressions) {
+                Type type = process(expression, context);
+                if (!type.getTypeSignature().getBase().equals(StandardTypes.VARCHAR)) {
                     addOrReplaceExpressionCoercion(expression, type, superType);
                 }
             }
