@@ -20,6 +20,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static com.google.common.base.MoreObjects.toStringHelper;
+import static java.util.Locale.ENGLISH;
 import static java.util.Objects.requireNonNull;
 
 public final class ColumnDefinition
@@ -44,8 +45,11 @@ public final class ColumnDefinition
     private ColumnDefinition(Optional<NodeLocation> location, Identifier name, String type, boolean nullable, List<Property> properties, Optional<String> comment)
     {
         super(location);
-        this.name = requireNonNull(name, "name is null");
-        this.type = requireNonNull(type, "type is null");
+        requireNonNull(name, "name is null");
+        requireNonNull(type, "type is null");
+
+        this.name = name;
+        this.type = type.equalsIgnoreCase("string") ? "varchar" : type.toLowerCase(ENGLISH);
         this.nullable = nullable;
         this.properties = requireNonNull(properties, "properties is null");
         this.comment = requireNonNull(comment, "comment is null");
