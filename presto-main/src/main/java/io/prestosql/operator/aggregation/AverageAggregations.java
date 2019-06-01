@@ -13,6 +13,7 @@
  */
 package io.prestosql.operator.aggregation;
 
+import io.airlift.slice.Slice;
 import io.prestosql.operator.aggregation.state.LongAndDoubleState;
 import io.prestosql.spi.block.BlockBuilder;
 import io.prestosql.spi.function.AggregationFunction;
@@ -22,6 +23,7 @@ import io.prestosql.spi.function.InputFunction;
 import io.prestosql.spi.function.OutputFunction;
 import io.prestosql.spi.function.SqlType;
 import io.prestosql.spi.type.StandardTypes;
+import io.prestosql.util.SliceUtils;
 
 import static io.prestosql.spi.type.DoubleType.DOUBLE;
 
@@ -42,6 +44,13 @@ public final class AverageAggregations
     {
         state.setLong(state.getLong() + 1);
         state.setDouble(state.getDouble() + value);
+    }
+
+    @InputFunction
+    public static void input(@AggregationState LongAndDoubleState state, @SqlType(StandardTypes.VARCHAR) Slice slice)
+    {
+        state.setLong(state.getLong() + 1);
+        state.setDouble(state.getDouble() + SliceUtils.toDouble(slice));
     }
 
     @CombineFunction
