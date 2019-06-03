@@ -103,7 +103,7 @@ public class TupleDomainOrcPredicate<C>
 
     private boolean columnOverlaps(ColumnReference<C> columnReference, Domain predicateDomain, long numberOfRows, ColumnStatistics columnStatistics)
     {
-        Domain stripeDomain = getDomain(columnReference.getType(), numberOfRows, columnStatistics);
+        Domain stripeDomain = getDomain(predicateDomain.getType(), numberOfRows, columnStatistics);
         if (!stripeDomain.overlaps(predicateDomain)) {
             // there is no overlap between the predicate and this column
             return false;
