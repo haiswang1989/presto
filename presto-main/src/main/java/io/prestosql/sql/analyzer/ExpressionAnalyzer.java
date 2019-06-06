@@ -530,9 +530,14 @@ public class ExpressionAnalyzer
                 coerceType(context, whenClause.getOperand(), BOOLEAN, "CASE WHEN clause");
             }
 
-            Type type = coerceToSingleType(context,
-                    "All CASE results must be the same type: %s",
-                    getCaseResultExpressions(node.getWhenClauses(), node.getDefaultValue()));
+            Type type;
+            List<Expression> expressions = getCaseResultExpressions(node.getWhenClauses(), node.getDefaultValue());
+            try {
+                type = coerceToSingleType(context, "All CASE results must be the same type: %s", expressions);
+            }
+            catch (Exception e) {
+                type = coerceToVarcharType(context, expressions);
+            }
             setExpressionType(node, type);
 
             for (WhenClause whenClause : node.getWhenClauses()) {
