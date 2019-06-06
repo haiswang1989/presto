@@ -617,7 +617,8 @@ public class ExpressionAnalyzer
         {
             Type valueType = process(node.getValue(), context);
             if (!(valueType instanceof CharType) && !(valueType instanceof VarcharType)) {
-                coerceType(context, node.getValue(), VARCHAR, "Left side of LIKE expression");
+                addOrReplaceExpressionCoercion(node.getValue(), valueType, VarcharType.createUnboundedVarcharType());
+//                coerceType(context, node.getValue(), VARCHAR, "Left side of LIKE expression");
             }
 
             Type patternType = getVarcharType(node.getPattern(), context);
