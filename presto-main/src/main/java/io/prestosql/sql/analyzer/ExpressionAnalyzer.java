@@ -1028,7 +1028,12 @@ public class ExpressionAnalyzer
                 }
             }
             else if (valueList instanceof SubqueryExpression) {
-                coerceToSingleType(context, node, "value and result of subquery must be of the same type for IN expression: %s vs %s", value, valueList);
+                try {
+                    coerceToSingleType(context, node, "value and result of subquery must be of the same type for IN expression: %s vs %s", value, valueList);
+                }
+                catch (Exception e) {
+                    coerceToVarcharType(context, ImmutableList.<Expression>builder().add(value, valueList).build());
+                }
             }
 
             return setExpressionType(node, BOOLEAN);
