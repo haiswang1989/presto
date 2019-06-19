@@ -1241,13 +1241,19 @@ public class ExpressionAnalyzer
             for (Expression expression : arguments) {
                 argumentTypes.add(process(expression, context));
             }
+            ImmutableList<Type> types = argumentTypes.build();
 
             Signature operatorSignature;
             try {
-                operatorSignature = functionRegistry.resolveOperator(operatorType, argumentTypes.build());
+                operatorSignature = functionRegistry.resolveOperator(operatorType, types);
             }
             catch (OperatorNotFoundException e) {
-                throw new SemanticException(TYPE_MISMATCH, node, "%s", e.getMessage());
+                ImmutableList.Builder<Type> typesCoerce = ImmutableList.builder();
+                for (int i = 0; i < arguments.length; i++) {
+                    addOrReplaceExpressionCoercion(arguments[i], types.get(i), DOUBLE);
+                    typesCoerce.add(setExpressionType(arguments[i], DOUBLE));
+                }
+                operatorSignature = functionRegistry.resolveOperator(operatorType, typesCoerce.build());
             }
             catch (PrestoException e) {
                 if (e.getErrorCode().getCode() == StandardErrorCode.AMBIGUOUS_FUNCTION_CALL.toErrorCode().getCode()) {
