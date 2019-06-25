@@ -100,8 +100,12 @@ public final class DoubleOperators
 
     @ScalarOperator(DIVIDE)
     @SqlType(StandardTypes.DOUBLE)
-    public static double divide(@SqlType(StandardTypes.DOUBLE) double left, @SqlType(StandardTypes.DOUBLE) double right)
+    @SqlNullable
+    public static Double divide(@SqlType(StandardTypes.DOUBLE) double left, @SqlType(StandardTypes.DOUBLE) double right)
     {
+        if (right == 0) {
+            return null;
+        }
         return left / right;
     }
 
