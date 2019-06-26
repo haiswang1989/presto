@@ -31,7 +31,7 @@ import static io.prestosql.operator.aggregation.FloatingPointBitsConverterUtil.d
 import static io.prestosql.operator.aggregation.FloatingPointBitsConverterUtil.sortableLongToDouble;
 import static io.prestosql.spi.type.DoubleType.DOUBLE;
 
-@AggregationFunction("approx_percentile")
+@AggregationFunction(value = "approx_percentile", alias = "percentile_approx")
 public final class ApproximateDoublePercentileArrayAggregations
 {
     private ApproximateDoublePercentileArrayAggregations() {}

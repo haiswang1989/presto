@@ -33,7 +33,7 @@ import static io.prestosql.util.Failures.checkCondition;
 import static java.lang.Float.floatToRawIntBits;
 import static java.lang.Float.intBitsToFloat;
 
-@AggregationFunction("approx_percentile")
+@AggregationFunction(value = "approx_percentile", alias = "percentile_approx")
 public class ApproximateRealPercentileAggregations
 {
     private ApproximateRealPercentileAggregations() {}

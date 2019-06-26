@@ -33,7 +33,7 @@ import static io.prestosql.spi.type.BigintType.BIGINT;
 import static io.prestosql.spi.type.DoubleType.DOUBLE;
 import static io.prestosql.util.Failures.checkCondition;
 
-@AggregationFunction("approx_percentile")
+@AggregationFunction(value = "approx_percentile", alias = "percentile_approx")
 public final class ApproximateLongPercentileArrayAggregations
 {
     private ApproximateLongPercentileArrayAggregations() {}

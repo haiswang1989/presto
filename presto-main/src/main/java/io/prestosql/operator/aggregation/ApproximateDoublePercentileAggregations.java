@@ -31,7 +31,7 @@ import static io.prestosql.spi.StandardErrorCode.INVALID_FUNCTION_ARGUMENT;
 import static io.prestosql.spi.type.DoubleType.DOUBLE;
 import static io.prestosql.util.Failures.checkCondition;
 
-@AggregationFunction("approx_percentile")
+@AggregationFunction(value = "approx_percentile", alias = "percentile_approx")
 public final class ApproximateDoublePercentileAggregations
 {
     private ApproximateDoublePercentileAggregations() {}
