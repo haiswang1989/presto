@@ -313,8 +313,8 @@ public final class DecimalOperators
                 .kind(SCALAR)
                 .operatorType(DIVIDE)
                 .longVariableConstraints(
-                        longVariableExpression("r_precision", "min(38, a_precision + b_scale + max(b_scale - a_scale, 0))"),
-                        longVariableExpression("r_scale", "max(a_scale, b_scale)"))
+                        longVariableExpression("r_precision", "min(38, a_precision + b_scale + max(max(b_scale, 6) - a_scale, 0))"),
+                        longVariableExpression("r_scale", "max(a_scale, max(b_scale, 6))"))
                 .argumentTypes(decimalLeftSignature, decimalRightSignature)
                 .returnType(decimalResultSignature)
                 .build();
