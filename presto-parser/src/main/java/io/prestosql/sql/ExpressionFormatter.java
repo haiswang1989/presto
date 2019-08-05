@@ -697,7 +697,7 @@ public final class ExpressionFormatter
     static String formatStringLiteral(String s)
     {
         s = s.replace("'", "''");
-        if (CharMatcher.inRange((char) 0x20, (char) 0x7E).matchesAllOf(s)) {
+        if (CharMatcher.inRange((char) 0x20, (char) 0x7E).or(CharMatcher.inRange((char) 0x4E00, (char) 0x9FA5)).matchesAllOf(s)) {
             return "'" + s + "'";
         }
 
