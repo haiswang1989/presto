@@ -697,7 +697,7 @@ public final class ExpressionFormatter
     static String formatStringLiteral(String s)
     {
         s = s.replace("'", "''");
-        if (CharMatcher.inRange((char) 0x20, (char) 0x7E).or(CharMatcher.inRange((char) 0x4E00, (char) 0x9FA5)).matchesAllOf(s)) {
+        if (CharMatcher.inRange((char) 0x20, (char) 0x7E).or(Chinese.INSTANCE).matchesAllOf(s)) {
             return "'" + s + "'";
         }
 
@@ -825,5 +825,32 @@ public final class ExpressionFormatter
 
             return builder.toString();
         };
+    }
+
+    private static final class Chinese extends CharMatcher
+    {
+        static final Chinese INSTANCE = new Chinese();
+
+        @Override
+        public boolean matches(char c)
+        {
+            Character.UnicodeBlock ub = Character.UnicodeBlock.of(c);
+            if (ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS
+                    || ub == Character.UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS
+                    || ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A
+                    || ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_B
+                    || ub == Character.UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION
+                    || ub == Character.UnicodeBlock.HALFWIDTH_AND_FULLWIDTH_FORMS
+                    || ub == Character.UnicodeBlock.GENERAL_PUNCTUATION) {
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public String toString()
+        {
+            return "CharMatcher.chinese()";
+        }
     }
 }
