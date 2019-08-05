@@ -827,7 +827,8 @@ public final class ExpressionFormatter
         };
     }
 
-    private static final class Chinese extends CharMatcher
+    private static final class Chinese
+            extends CharMatcher
     {
         static final Chinese INSTANCE = new Chinese();
 
