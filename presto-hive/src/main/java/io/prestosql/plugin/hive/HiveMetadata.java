@@ -455,8 +455,10 @@ public class HiveMetadata
 
         // External location property
         ImmutableMap.Builder<String, Object> properties = ImmutableMap.builder();
-        if (table.get().getTableType().equals(EXTERNAL_TABLE.name())) {
-            properties.put(EXTERNAL_LOCATION_PROPERTY, table.get().getStorage().getLocation());
+
+        String location = table.get().getStorage().getLocation();
+        if (location != null) {
+            properties.put(EXTERNAL_LOCATION_PROPERTY, location);
         }
 
         // Storage format property
