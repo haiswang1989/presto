@@ -259,6 +259,8 @@ import static io.prestosql.operator.scalar.ArrayTransformFunction.ARRAY_TRANSFOR
 import static io.prestosql.operator.scalar.CastFromUnknownOperator.CAST_FROM_UNKNOWN;
 import static io.prestosql.operator.scalar.ConcatFunction.VARBINARY_CONCAT;
 import static io.prestosql.operator.scalar.ConcatFunction.VARCHAR_CONCAT;
+import static io.prestosql.operator.scalar.ConcatWsFunction.VARBINARY_CONCAT_WS;
+import static io.prestosql.operator.scalar.ConcatWsFunction.VARCHAR_CONCAT_WS;
 import static io.prestosql.operator.scalar.ElementToArrayConcatFunction.ELEMENT_TO_ARRAY_CONCAT_FUNCTION;
 import static io.prestosql.operator.scalar.Greatest.GREATEST;
 import static io.prestosql.operator.scalar.IdentityCast.IDENTITY_CAST;
@@ -634,6 +636,7 @@ public class FunctionRegistry
                 .function(COUNT_COLUMN)
                 .functions(ROW_HASH_CODE, ROW_TO_JSON, JSON_TO_ROW, JSON_STRING_TO_ROW, ROW_DISTINCT_FROM, ROW_EQUAL, ROW_GREATER_THAN, ROW_GREATER_THAN_OR_EQUAL, ROW_LESS_THAN, ROW_LESS_THAN_OR_EQUAL, ROW_NOT_EQUAL, ROW_TO_ROW_CAST, ROW_INDETERMINATE)
                 .functions(VARCHAR_CONCAT, VARBINARY_CONCAT)
+                .functions(VARCHAR_CONCAT_WS, VARBINARY_CONCAT_WS)
                 .function(DECIMAL_TO_DECIMAL_CAST)
                 .function(castVarcharToRe2JRegexp(featuresConfig.getRe2JDfaStatesLimit(), featuresConfig.getRe2JDfaRetries()))
                 .function(castCharToRe2JRegexp(featuresConfig.getRe2JDfaStatesLimit(), featuresConfig.getRe2JDfaRetries()))
