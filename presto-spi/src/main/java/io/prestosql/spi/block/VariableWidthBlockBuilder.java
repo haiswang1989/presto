@@ -20,8 +20,10 @@ import io.airlift.slice.Slices;
 import org.openjdk.jol.info.ClassLayout;
 
 import javax.annotation.Nullable;
-
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.BiConsumer;
 
 import static io.airlift.slice.SizeOf.SIZE_OF_BYTE;
@@ -365,5 +367,16 @@ public class VariableWidthBlockBuilder
         sb.append(", size=").append(sliceOutput.size());
         sb.append('}');
         return sb.toString();
+    }
+
+    @Override
+    public Collection<Integer> distinctPositions()
+    {
+        Map<Slice, Integer> result = new HashMap<>();
+        for (int i = 0; i < getPositionCount(); i++) {
+            Slice slice = getSlice(i, 0, getSliceLength(i));
+            result.putIfAbsent(slice, i);
+        }
+        return result.values();
     }
 }

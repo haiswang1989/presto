@@ -79,4 +79,16 @@ public class SingleArrayAggregationState
     {
         blockBuilder = null;
     }
+
+    @Override
+    public void distinct(ArrayAggregationStateConsumer consumer)
+    {
+        if (blockBuilder == null) {
+            return;
+        }
+
+        for (Integer value : blockBuilder.distinctPositions()) {
+            consumer.accept(blockBuilder, value);
+        }
+    }
 }

@@ -16,8 +16,10 @@ package io.prestosql.spi.block;
 import org.openjdk.jol.info.ClassLayout;
 
 import javax.annotation.Nullable;
-
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.BiConsumer;
 
 import static io.airlift.slice.SizeOf.sizeOf;
@@ -339,5 +341,15 @@ public class LongArrayBlockBuilder
         if (position < 0 || position >= getPositionCount()) {
             throw new IllegalArgumentException("position is not valid");
         }
+    }
+
+    @Override
+    public Collection<Integer> distinctPositions()
+    {
+        Map<Long, Integer> result = new HashMap<>();
+        for (int i = 0; i < getPositionCount(); i++) {
+            result.putIfAbsent(values[i], i);
+        }
+        return result.values();
     }
 }
