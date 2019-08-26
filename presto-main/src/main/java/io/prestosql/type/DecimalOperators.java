@@ -322,6 +322,7 @@ public final class DecimalOperators
                 .signature(signature)
                 .deterministic(true)
                 .choice(choice -> choice
+                        .nullableResult(true)
                         .implementation(methodsGroup -> methodsGroup
                                 .methods("divideShortShortShort", "divideShortLongShort", "divideLongShortShort", "divideShortShortLong", "divideLongLongLong", "divideShortLongLong", "divideLongShortLong")
                                 .withExtraParameters(DecimalOperators::divideRescaleFactor)))
@@ -339,14 +340,14 @@ public final class DecimalOperators
     }
 
     @UsedByGeneratedCode
-    public static long divideShortShortShort(long dividend, long divisor, int rescaleFactor)
+    public static Long divideShortShortShort(long dividend, long divisor, int rescaleFactor)
     {
         if (divisor == 0) {
-            throw new PrestoException(DIVISION_BY_ZERO, "Division by zero");
+            return null;
         }
 
         if (dividend == 0) {
-            return 0;
+            return 0L;
         }
 
         int resultSignum = signum(dividend) * signum(divisor);
@@ -366,10 +367,10 @@ public final class DecimalOperators
     }
 
     @UsedByGeneratedCode
-    public static long divideShortLongShort(long dividend, Slice divisor, int rescaleFactor)
+    public static Long divideShortLongShort(long dividend, Slice divisor, int rescaleFactor)
     {
         if (isZero(divisor)) {
-            throw new PrestoException(DIVISION_BY_ZERO, "Division by zero");
+            return null;
         }
         try {
             return unscaledDecimalToUnscaledLong(divideRoundUp(dividend, rescaleFactor, divisor));
@@ -380,10 +381,10 @@ public final class DecimalOperators
     }
 
     @UsedByGeneratedCode
-    public static long divideLongShortShort(Slice dividend, long divisor, int rescaleFactor)
+    public static Long divideLongShortShort(Slice dividend, long divisor, int rescaleFactor)
     {
         if (divisor == 0) {
-            throw new PrestoException(DIVISION_BY_ZERO, "Division by zero");
+            return null;
         }
         try {
             return unscaledDecimalToUnscaledLong(divideRoundUp(dividend, rescaleFactor, divisor));
@@ -397,7 +398,7 @@ public final class DecimalOperators
     public static Slice divideShortShortLong(long dividend, long divisor, int rescaleFactor)
     {
         if (divisor == 0) {
-            throw new PrestoException(DIVISION_BY_ZERO, "Division by zero");
+            return null;
         }
         try {
             return divideRoundUp(dividend, rescaleFactor, divisor);
@@ -411,7 +412,7 @@ public final class DecimalOperators
     public static Slice divideLongLongLong(Slice dividend, Slice divisor, int rescaleFactor)
     {
         if (isZero(divisor)) {
-            throw new PrestoException(DIVISION_BY_ZERO, "Division by zero");
+            return null;
         }
         try {
             return divideRoundUp(dividend, rescaleFactor, divisor);
@@ -425,7 +426,7 @@ public final class DecimalOperators
     public static Slice divideShortLongLong(long dividend, Slice divisor, int rescaleFactor)
     {
         if (isZero(divisor)) {
-            throw new PrestoException(DIVISION_BY_ZERO, "Division by zero");
+            return null;
         }
         try {
             return divideRoundUp(dividend, rescaleFactor, divisor);
@@ -439,7 +440,7 @@ public final class DecimalOperators
     public static Slice divideLongShortLong(Slice dividend, long divisor, int rescaleFactor)
     {
         if (divisor == 0) {
-            throw new PrestoException(DIVISION_BY_ZERO, "Division by zero");
+            return null;
         }
         try {
             return divideRoundUp(dividend, rescaleFactor, divisor);
