@@ -1248,10 +1248,15 @@ public class ExpressionAnalyzer
                 operatorSignature = functionRegistry.resolveOperator(operatorType, types);
             }
             catch (OperatorNotFoundException e) {
+                Type temp = DOUBLE;
+                if (operatorType.equals(OperatorType.EQUAL) || operatorType.equals(OperatorType.NOT_EQUAL)) {
+                    temp = VARCHAR;
+                }
+
                 ImmutableList.Builder<Type> typesCoerce = ImmutableList.builder();
                 for (int i = 0; i < arguments.length; i++) {
-                    addOrReplaceExpressionCoercion(arguments[i], types.get(i), DOUBLE);
-                    typesCoerce.add(setExpressionType(arguments[i], DOUBLE));
+                    addOrReplaceExpressionCoercion(arguments[i], types.get(i), temp);
+                    typesCoerce.add(setExpressionType(arguments[i], temp));
                 }
                 operatorSignature = functionRegistry.resolveOperator(operatorType, typesCoerce.build());
             }
