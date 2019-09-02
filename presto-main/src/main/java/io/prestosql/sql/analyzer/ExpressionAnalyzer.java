@@ -1248,17 +1248,17 @@ public class ExpressionAnalyzer
                 operatorSignature = functionRegistry.resolveOperator(operatorType, types);
             }
             catch (OperatorNotFoundException e) {
-                Type temp = DOUBLE;
-                if (operatorType.equals(OperatorType.EQUAL) || operatorType.equals(OperatorType.NOT_EQUAL)) {
-                    temp = VARCHAR;
+                try {
+                    ImmutableList.Builder<Type> coerceTypes = ImmutableList.builder();
+                    for (int i = 0; i < arguments.length; i++) {
+                        addOrReplaceExpressionCoercion(arguments[i], types.get(i), DOUBLE);
+                        coerceTypes.add(setExpressionType(arguments[i], DOUBLE));
+                    }
+                    operatorSignature = functionRegistry.resolveOperator(operatorType, coerceTypes.build());
                 }
-
-                ImmutableList.Builder<Type> typesCoerce = ImmutableList.builder();
-                for (int i = 0; i < arguments.length; i++) {
-                    addOrReplaceExpressionCoercion(arguments[i], types.get(i), temp);
-                    typesCoerce.add(setExpressionType(arguments[i], temp));
+                catch (Exception e1) {
+                    throw new SemanticException(TYPE_MISMATCH, node, "%s", e.getMessage());
                 }
-                operatorSignature = functionRegistry.resolveOperator(operatorType, typesCoerce.build());
             }
             catch (PrestoException e) {
                 if (e.getErrorCode().getCode() == StandardErrorCode.AMBIGUOUS_FUNCTION_CALL.toErrorCode().getCode()) {
