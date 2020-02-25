@@ -107,8 +107,8 @@ public final class ConcatFunction
     @Override
     public ScalarFunctionImplementation specialize(BoundVariables boundVariables, int arity, TypeManager typeManager, FunctionRegistry functionRegistry)
     {
-        if (arity < 2) {
-            throw new PrestoException(INVALID_FUNCTION_ARGUMENT, "There must be two or more concatenation arguments");
+        if (arity < 1) {
+            throw new PrestoException(INVALID_FUNCTION_ARGUMENT, "There must be one or more concatenation arguments");
         }
 
         Class<?> clazz = generateConcat(getSignature().getReturnType(), arity);

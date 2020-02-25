@@ -107,6 +107,7 @@ import io.prestosql.type.FunctionType;
 import javax.annotation.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -858,7 +859,14 @@ public class ExpressionAnalyzer
                 }
             }
 
-            ImmutableList<TypeSignatureProvider> argumentTypes = argumentTypesBuilder.build();
+            List<TypeSignatureProvider> argumentTypes = argumentTypesBuilder.build();
+
+            // support implicit type conversion for concat function
+            if (node.getName().toString().equals("concat")) {
+                coerceToVarcharType(context, node.getArguments());
+                argumentTypes = TypeSignatureProvider.fromTypes(Collections.nCopies(node.getArguments().size(), VARCHAR));
+            }
+
             Signature function = resolveFunction(node, argumentTypes, functionRegistry);
 
             if (node.getOrderBy().isPresent()) {
