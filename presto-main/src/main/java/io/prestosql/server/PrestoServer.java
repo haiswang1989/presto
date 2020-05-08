@@ -46,6 +46,7 @@ import io.prestosql.server.security.PasswordAuthenticatorManager;
 import io.prestosql.server.security.ServerSecurityModule;
 import io.prestosql.sql.parser.SqlParserOptions;
 import org.weakref.jmx.guice.MBeanModule;
+import sun.misc.Signal;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -143,6 +144,8 @@ public class PrestoServer
 
             injector.getInstance(ServerInfoResource.class).startupComplete();
 
+            registerSignal(injector.getInstance(GracefulShutdownHandler.class));
+
             log.info("======== SERVER STARTED ========");
         }
         catch (Throwable e) {
@@ -214,5 +217,12 @@ public class PrestoServer
             return;
         }
         log.info("%s: %s", name, path);
+    }
+
+    private void registerSignal(GracefulShutdownHandler gracefulShutdown)
+    {
+        Signal.handle(new Signal("TERM"), signal -> {
+            gracefulShutdown.requestShutdown();
+        });
     }
 }

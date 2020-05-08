@@ -18,14 +18,14 @@ import io.airlift.units.Duration;
 
 import javax.validation.constraints.NotNull;
 
-import static java.util.concurrent.TimeUnit.MINUTES;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class ServerConfig
 {
     private boolean coordinator = true;
     private String prestoVersion = getClass().getPackage().getImplementationVersion();
     private boolean includeExceptionInResponse = true;
-    private Duration gracePeriod = new Duration(2, MINUTES);
+    private Duration gracePeriod = new Duration(10, SECONDS);
     private boolean enhancedErrorReporting = true;
 
     public boolean isCoordinator()
