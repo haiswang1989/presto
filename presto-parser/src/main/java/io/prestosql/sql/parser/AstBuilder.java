@@ -180,6 +180,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -626,7 +627,7 @@ class AstBuilder
     @Override
     public Node visitQuerySpecification(SqlBaseParser.QuerySpecificationContext context)
     {
-        Optional<Relation> from = Optional.empty();
+        Relation from = null;
         List<SelectItem> selectItems = visit(context.selectItem(), SelectItem.class);
 
         List<Relation> relations = visit(context.relation(), Relation.class);
@@ -639,18 +640,54 @@ class AstBuilder
                 relation = new Join(getLocation(context), Join.Type.IMPLICIT, relation, iterator.next(), Optional.empty());
             }
 
-            from = Optional.of(relation);
+            from = relation;
+        }
+
+        List<AliasedRelation> lateralViews = visit(context.lateralView(), AliasedRelation.class);
+        for (Relation to : lateralViews) {
+            from = new Join(getLocation(context), Join.Type.CROSS, from, to, Optional.empty());
         }
 
         return new QuerySpecification(
                 getLocation(context),
                 new Select(getLocation(context.SELECT()), isDistinct(context.setQuantifier()), selectItems),
-                from,
+                Optional.of(from),
                 visitIfPresent(context.where, Expression.class),
                 visitIfPresent(context.groupBy(), GroupBy.class),
                 visitIfPresent(context.having, Expression.class),
                 Optional.empty(),
                 Optional.empty());
+    }
+
+    @Override
+    public Node visitLateralView(SqlBaseParser.LateralViewContext context)
+    {
+        if (context.OUTER() != null) {
+            throw parseError("Unsupported outer lateral view", context);
+        }
+
+        boolean withOrdinality;
+        String name = getQualifiedName(context.qualifiedName()).toString();
+        switch (name.toLowerCase(Locale.ENGLISH)) {
+            case "explode":
+                withOrdinality = false;
+                break;
+            case "posexplode":
+                withOrdinality = true;
+                break;
+            default:
+                throw parseError("Unsupported udtf: " + name, context);
+        }
+
+        Unnest unnest = new Unnest(getLocation(context), visit(context.expression(), Expression.class), withOrdinality);
+        List<Identifier> columnNames = visit(context.colName, Identifier.class);
+
+        if (!columnNames.isEmpty()) {
+            return new AliasedRelation(getLocation(context), unnest, (Identifier) visit(context.tblName), columnNames);
+        }
+        else {
+            return new AliasedRelation(getLocation(context), unnest, (Identifier) visit(context.tblName), null);
+        }
     }
 
     @Override

@@ -171,7 +171,7 @@ sortItem
 
 querySpecification
     : SELECT setQuantifier? selectItem (',' selectItem)*
-      (FROM relation (',' relation)*)?
+      (FROM relation (',' relation)* lateralView*)?
       (WHERE where=booleanExpression)?
       (GROUP BY groupBy)?
       (HAVING having=booleanExpression)?
@@ -195,6 +195,10 @@ groupingSet
 
 namedQuery
     : name=identifier (columnAliases)? AS '(' query ')'
+    ;
+
+lateralView
+    : LATERAL VIEW (OUTER)? qualifiedName '(' (expression (',' expression)*)? ')' tblName=identifier (AS? colName+=identifier (',' colName+=identifier)*)?
     ;
 
 setQuantifier
