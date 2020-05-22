@@ -651,7 +651,7 @@ class AstBuilder
         return new QuerySpecification(
                 getLocation(context),
                 new Select(getLocation(context.SELECT()), isDistinct(context.setQuantifier()), selectItems),
-                Optional.of(from),
+                Optional.ofNullable(from),
                 visitIfPresent(context.where, Expression.class),
                 visitIfPresent(context.groupBy(), GroupBy.class),
                 visitIfPresent(context.having, Expression.class),
