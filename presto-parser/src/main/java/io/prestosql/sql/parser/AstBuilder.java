@@ -683,6 +683,10 @@ class AstBuilder
         List<Identifier> columnNames = visit(context.colName, Identifier.class);
 
         if (!columnNames.isEmpty()) {
+            if (withOrdinality) {
+                // reverse position
+                columnNames.add(columnNames.remove(0));
+            }
             return new AliasedRelation(getLocation(context), unnest, (Identifier) visit(context.tblName), columnNames);
         }
         else {
