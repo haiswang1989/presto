@@ -134,7 +134,7 @@ public class CollectAggregationFunction
         }
         else {
             BlockBuilder entryBuilder = out.beginBlockEntry();
-            state.distinct((block, position) -> elementType.appendTo(block, position, entryBuilder));
+            state.forEach((block, position) -> elementType.appendTo(block, position, entryBuilder));
             out.closeEntry();
         }
     }

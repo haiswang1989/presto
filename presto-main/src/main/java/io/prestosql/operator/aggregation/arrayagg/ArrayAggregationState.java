@@ -34,6 +34,4 @@ public interface ArrayAggregationState
     {
         throw new UnsupportedOperationException();
     }
-
-    default void distinct(ArrayAggregationStateConsumer consumer) {}
 }

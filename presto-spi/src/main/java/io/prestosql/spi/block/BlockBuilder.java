@@ -15,8 +15,6 @@ package io.prestosql.spi.block;
 
 import io.airlift.slice.Slice;
 
-import java.util.Collection;
-
 public interface BlockBuilder
         extends Block
 {
@@ -114,9 +112,4 @@ public interface BlockBuilder
      * Creates a new block builder of the same type based on the current usage statistics of this block builder.
      */
     BlockBuilder newBlockBuilderLike(BlockBuilderStatus blockBuilderStatus);
-
-    default Collection<Integer> distinctPositions()
-    {
-        throw new UnsupportedOperationException(getClass().getName());
-    }
 }
