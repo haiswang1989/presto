@@ -58,7 +58,12 @@ public class ArrayAggregationFunction
 
     public ArrayAggregationFunction(ArrayAggGroupImplementation groupMode)
     {
-        super(NAME,
+        this(NAME, groupMode);
+    }
+
+    public ArrayAggregationFunction(String name, ArrayAggGroupImplementation groupMode)
+    {
+        super(name,
                 ImmutableList.of(typeVariable("T")),
                 ImmutableList.of(),
                 parseTypeSignature("array(T)"),
