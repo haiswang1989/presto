@@ -245,8 +245,10 @@ public class HivePartitionManager
         List<String> filter = new ArrayList<>();
         for (HiveColumnHandle partitionKey : partitionKeys) {
             Domain domain = effectivePredicate.getDomains().get().get(partitionKey);
-            if (domain != null && domain.isNullableSingleValue()) {
+            if (domain != null) {
                 hasPartitionKey = true;
+            }
+            if (domain != null && domain.isNullableSingleValue()) {
                 Object value = domain.getNullableSingleValue();
                 Type type = domain.getType();
                 if (value == null) {
