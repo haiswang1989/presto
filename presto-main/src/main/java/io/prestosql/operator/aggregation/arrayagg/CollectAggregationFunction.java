@@ -24,14 +24,20 @@ import io.prestosql.operator.aggregation.AggregationMetadata.AccumulatorStateDes
 import io.prestosql.operator.aggregation.AggregationMetadata.ParameterMetadata;
 import io.prestosql.operator.aggregation.GenericAccumulatorFactoryBinder;
 import io.prestosql.operator.aggregation.InternalAggregationFunction;
+import io.prestosql.spi.block.ArrayBlockBuilder;
 import io.prestosql.spi.block.Block;
 import io.prestosql.spi.block.BlockBuilder;
+import io.prestosql.spi.block.ByteArrayBlockBuilder;
+import io.prestosql.spi.block.IntArrayBlockBuilder;
+import io.prestosql.spi.block.LongArrayBlockBuilder;
+import io.prestosql.spi.block.VariableWidthBlockBuilder;
 import io.prestosql.spi.function.AccumulatorState;
 import io.prestosql.spi.function.AccumulatorStateFactory;
 import io.prestosql.spi.function.AccumulatorStateSerializer;
 import io.prestosql.spi.type.ArrayType;
 import io.prestosql.spi.type.Type;
 import io.prestosql.spi.type.TypeManager;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 
 import java.lang.invoke.MethodHandle;
 import java.util.List;
@@ -42,7 +48,11 @@ import static io.prestosql.operator.aggregation.AggregationMetadata.ParameterMet
 import static io.prestosql.operator.aggregation.AggregationMetadata.ParameterMetadata.ParameterType.NULLABLE_BLOCK_INPUT_CHANNEL;
 import static io.prestosql.operator.aggregation.AggregationMetadata.ParameterMetadata.ParameterType.STATE;
 import static io.prestosql.operator.aggregation.AggregationUtils.generateAggregationName;
+import static io.prestosql.spi.type.BigintType.BIGINT;
+import static io.prestosql.spi.type.BooleanType.BOOLEAN;
+import static io.prestosql.spi.type.IntegerType.INTEGER;
 import static io.prestosql.spi.type.TypeSignature.parseTypeSignature;
+import static io.prestosql.spi.type.VarcharType.VARCHAR;
 import static io.prestosql.util.Reflection.methodHandle;
 import static java.util.Objects.requireNonNull;
 
@@ -134,8 +144,40 @@ public class CollectAggregationFunction
         }
         else {
             BlockBuilder entryBuilder = out.beginBlockEntry();
-            state.forEach((block, position) -> elementType.appendTo(block, position, entryBuilder));
+            ObjectOpenHashSet objects = new ObjectOpenHashSet();
+            state.forEach((block, position) -> {
+                Object value = getObjectValue(block, position);
+                if (!objects.contains(value)) {
+                    objects.add(value);
+                    elementType.appendTo(block, position, entryBuilder);
+                }
+            });
             out.closeEntry();
         }
+    }
+
+    private static Object getObjectValue(Block block, int position)
+    {
+        if (block instanceof LongArrayBlockBuilder) {
+            return BIGINT.getLong(block, position);
+        }
+
+        if (block instanceof IntArrayBlockBuilder) {
+            return INTEGER.getLong(block, position);
+        }
+
+        if (block instanceof VariableWidthBlockBuilder) {
+            return VARCHAR.getSlice(block, position);
+        }
+
+        if (block instanceof ByteArrayBlockBuilder) {
+            return BOOLEAN.getBoolean(block, position);
+        }
+
+        if (block instanceof ArrayBlockBuilder) {
+            return block.getSingleValueBlock(position);
+        }
+
+        throw new IllegalArgumentException("Unsupported block: " + block);
     }
 }
