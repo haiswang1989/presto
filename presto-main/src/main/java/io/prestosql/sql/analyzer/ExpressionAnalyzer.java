@@ -16,6 +16,7 @@ package io.prestosql.sql.analyzer;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
 import io.airlift.slice.SliceUtf8;
 import io.prestosql.Session;
@@ -103,6 +104,7 @@ import io.prestosql.sql.tree.TryExpression;
 import io.prestosql.sql.tree.WhenClause;
 import io.prestosql.sql.tree.WindowFrame;
 import io.prestosql.type.FunctionType;
+import io.prestosql.type.UnknownType;
 
 import javax.annotation.Nullable;
 
@@ -112,6 +114,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -172,6 +175,8 @@ public class ExpressionAnalyzer
     private final Function<Node, StatementAnalyzer> statementAnalyzerFactory;
     private final TypeProvider symbolTypes;
     private final boolean isDescribe;
+    private static final ImmutableSet<String> primitiveTypes = ImmutableSet.of(StandardTypes.TINYINT, StandardTypes.SMALLINT,
+            StandardTypes.INTEGER, StandardTypes.BIGINT, StandardTypes.DOUBLE, StandardTypes.DECIMAL, StandardTypes.BOOLEAN);
 
     private final Map<NodeRef<FunctionCall>, Signature> resolvedFunctions = new LinkedHashMap<>();
     private final Set<NodeRef<SubqueryExpression>> scalarSubqueries = new LinkedHashSet<>();
@@ -862,7 +867,7 @@ public class ExpressionAnalyzer
             List<TypeSignatureProvider> argumentTypes = argumentTypesBuilder.build();
 
             // support implicit type conversion for concat function
-            if (node.getName().toString().equals("concat")) {
+            if (node.getName().toString().equals("concat") && isPrimitiveType(argumentTypes)) {
                 coerceToVarcharType(context, node.getArguments());
                 argumentTypes = TypeSignatureProvider.fromTypes(Collections.nCopies(node.getArguments().size(), VARCHAR));
             }
@@ -1382,6 +1387,22 @@ public class ExpressionAnalyzer
             else if (typeOnlyCoercions.contains(ref)) {
                 typeOnlyCoercions.remove(ref);
             }
+        }
+
+        private boolean isPrimitiveType(List<TypeSignatureProvider> argumentTypes)
+        {
+            boolean checkType = false;
+            for (TypeSignatureProvider argumentType : argumentTypes) {
+                String baseType = argumentType.getTypeSignature().getBase();
+                if (Objects.equals(StandardTypes.VARCHAR, baseType) || Objects.equals(UnknownType.NAME, baseType)) {
+                    continue;
+                } else if (primitiveTypes.contains(baseType)) {
+                    checkType = true;
+                } else {
+                    return false;
+                }
+            }
+            return checkType;
         }
     }
 
