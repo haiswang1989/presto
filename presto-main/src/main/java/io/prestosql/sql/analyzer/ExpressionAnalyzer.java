@@ -1396,9 +1396,11 @@ public class ExpressionAnalyzer
                 String baseType = argumentType.getTypeSignature().getBase();
                 if (Objects.equals(StandardTypes.VARCHAR, baseType) || Objects.equals(UnknownType.NAME, baseType)) {
                     continue;
-                } else if (primitiveTypes.contains(baseType)) {
+                }
+                else if (primitiveTypes.contains(baseType)) {
                     checkType = true;
-                } else {
+                }
+                else {
                     return false;
                 }
             }
