@@ -241,13 +241,9 @@ public class HivePartitionManager
     {
         checkArgument(effectivePredicate.getDomains().isPresent());
 
-        boolean hasPartitionKey = false;
         List<String> filter = new ArrayList<>();
         for (HiveColumnHandle partitionKey : partitionKeys) {
             Domain domain = effectivePredicate.getDomains().get().get(partitionKey);
-            if (domain != null) {
-                hasPartitionKey = true;
-            }
             if (domain != null && domain.isNullableSingleValue()) {
                 Object value = domain.getNullableSingleValue();
                 Type type = domain.getType();
@@ -301,10 +297,6 @@ public class HivePartitionManager
             else {
                 filter.add(PARTITION_VALUE_WILDCARD);
             }
-        }
-
-        if (!hasPartitionKey) {
-            throw new PrestoException(NOT_SUPPORTED, format("No partition key found for table %s. Expected: %s", tableName, partitionKeys));
         }
 
         // fetch the partition names
